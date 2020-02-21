@@ -1,5 +1,7 @@
 package com.gmall.manage.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.gmall.bean.PmsSkuAttrValue;
 import com.gmall.bean.PmsSkuImage;
 import com.gmall.bean.PmsSkuInfo;
@@ -9,13 +11,20 @@ import com.gmall.manage.mapper.PmsSkuImageMapper;
 import com.gmall.manage.mapper.PmsSkuInfoMapper;
 import com.gmall.manage.mapper.PmsSkuSaleAttrValueMapper;
 import com.gmall.manage.service.SkuService;
+import com.gmall.util.RedisUtils;
+import com.sun.org.apache.bcel.internal.generic.NEW;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.Jedis;
 
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
 @Service
 public class SkuServiceImpl implements SkuService {
     //打印日志
@@ -29,6 +38,9 @@ public class SkuServiceImpl implements SkuService {
 
     @Autowired
     private PmsSkuImageMapper pmsSkuImageMapper;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     /**
      * 根据三级分类查询所有的商品sku信息
@@ -93,6 +105,54 @@ public class SkuServiceImpl implements SkuService {
             pmsSkuImage.setSkuId(pmsSkuInfo.getId());
             pmsSkuImageMapper.insertSelective(pmsSkuImage);
         }
+    }
+
+    @Override
+    public PmsSkuInfo getSkuById(String skuId) {
+        PmsSkuInfo pmsSkuInfo = new PmsSkuInfo();
+        Jedis jedis = redisUtils.getJedis();//获取jedis对象
+        //判断缓存是否存在商品详情
+        String skuKey = "sku:" + skuId + ":info";
+        String skuJson = jedis.get(skuKey);
+        if (StringUtils.isNotBlank(skuJson)) {
+            //缓存中读取数据
+            pmsSkuInfo = JSON.parseObject(skuJson, PmsSkuInfo.class);
+        } else {
+            //从数据库中读取数据
+            //设置分布式锁
+            String token = UUID.randomUUID().toString();
+            // 拿到锁的线程有10秒的过期时间
+            String OK = jedis.set("sku:" + skuId + ":lock", token, "nx", "px", 10 * 1000);
+            if (StringUtils.isNotBlank(OK) && OK.equals(OK)) {
+                //10秒执行数据库，超时回会出现问题
+                pmsSkuInfo = getSkuByIdFromDb(skuId);
+                if (pmsSkuInfo != null) {
+                    //数据缓存到redis，并设置随机不同失效时间，防止redis雪崩
+                    int cacheTime = new Random().nextInt(10);
+                    jedis.setex("sku:" + skuId + ":info", cacheTime + 20, JSON.toJSONString(pmsSkuInfo));
+                } else {
+                    //数据库中不存在该sku，null或者空字符串值设置给redis，并设置失效时间，防止缓存穿透
+                    jedis.setex("sku:" + skuId + ":info", 60 * 5, JSON.toJSONString(""));
+                    //分布式锁执行完毕后，释放锁
+                    String lockToken = jedis.get("sku:" + skuId + ":lock");
+                    if (StringUtils.isNotBlank(lockToken) && lockToken.equals(token)) {
+                        jedis.del("sku:" + skuId + ":lock");// 用token确认删除的是自己的sku的锁
+                    }
+                }
+            }
+        }
+        return pmsSkuInfo;
+    }
+
+    public PmsSkuInfo getSkuByIdFromDb(String skuId) {
+        // sku商品对象
+        PmsSkuInfo skuInfo = pmsSkuInfoMapper.selectOneBySkuId(skuId);
+        // sku的图片集合
+        PmsSkuImage pmsSkuImage = new PmsSkuImage();
+        pmsSkuImage.setSkuId(skuId);
+        List<PmsSkuImage> pmsSkuImages = pmsSkuImageMapper.select(pmsSkuImage);
+        skuInfo.setSkuImageList(pmsSkuImages);
+        return skuInfo;
     }
 
 }

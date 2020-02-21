@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gmall.manage.mapper.PmsSkuInfoMapper">
+    <resultMap id="basePmsSkuInfoListMap" type="com.gmall.bean.PmsSkuInfo">
+        <id column="si_id" property="id"/>
+        <result column="product_id" property="productId"/>
+        <result column="price" property="price"/>
+        <result column="sku_name" property="skuName"/>
+        <result column="weight" property="weight"/>
+        <result column="sku_desc" property="skuDesc"/>
+        <result column="catalog3_id" property="catalog3Id"/>
+        <result column="sku_default_img" property="skuDefaultImg"/>
+        <collection property="skuSaleAttrValueList" resultMap="baseskuSaleAttrValueListMap"/>
+        <collection property="skuImageList" resultMap="baseskuImageListMap"/>
+    </resultMap>
+    <resultMap id="baseskuSaleAttrValueListMap" type="com.gmall.bean.PmsSkuSaleAttrValue">
+        <id column="ssav_id" property="id"/>
+        <result column="sku_id" property="skuId"/>
+        <result column="sale_attr_id" property="saleAttrId"/>
+        <result column="sale_attr_value_id" property="saleAttrValueId"/>
+        <result column="sale_attr_name" property="saleAttrName"/>
+        <result column="sale_attr_value_name" property="saleAttrValueName"/>
+    </resultMap>
+    <resultMap id="baseskuImageListMap" type="com.gmall.bean.PmsSkuImage">
+        <id column="img_id" property="id"/>
+        <result column="sku_id" property="skuId"/>
+        <result column="img_name" property="imgName"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="product_img_id" property="productImgId"/>
+        <result column="is_default" property="isDefault"/>
+    </resultMap>
+    <select id="selectSkuSaleAttrValueListBySpu" resultMap="basePmsSkuInfoListMap">
+        SELECT
+            si.*,ssav.*,si.id as si_id ,ssav.id as ssav_id
+        FROM
+            pms_sku_info si,
+            pms_sku_sale_attr_value ssav
+        WHERE
+            si.product_id = #{productId}
+        AND si.id = ssav.sku_id
+    </select>
+    <!--  <resultMap id="selectSkuSaleAttrValueListBySpuMap" type="com.atguigu.gmall.api.PmsSkuInfo" autoMapping="true">
+          <result column="si_id" property="id"></result>
+          <collection property="skuSaleAttrValueList" ofType="com.atguigu.gmall.api.PmsSkuSaleAttrValue"
+                      autoMapping="true">
+              <result column="ssav_id" property="id"></result>
+          </collection>
+      </resultMap>-->
+    <select id="selectOneBySkuId" resultMap="basePmsSkuInfoListMap">
+        select  si.*,si.id as si_id  from pms_sku_info si where si.id =#{skuId}
+    </select>
+    <!--<select id="selectImgBySkuIdList" resultType="baseskuImageListMap">
+        select  psi.*,psi.id as img_id  from pms_sku_image psi where psi.id =#{skuId}
+    </select>-->
+</mapper>

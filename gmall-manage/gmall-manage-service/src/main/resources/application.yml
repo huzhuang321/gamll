@@ -10,6 +10,12 @@ spring:
     hikari:
       max-lifetime: 28830000 # 一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟，建议设置比数据库超时时长少30秒，参考MySQL wait_timeout参数（show variables like '%timeout%';）
       maximum-pool-size: 9 # 连接池中允许的最大连接数。缺省值：10；推荐的公式：((core_count * 2) + effective_spindle_count)
+
+  redis:
+    database: 0            # Redis数据库索引（默认为0）
+    host: 127.0.0.1        # Redis服务器地址
+    port: 6379             # Redis服务器连接端口
+    password:              # Redis服务器连接密码（默认为空）
 eureka:
   client:
     service-url:
