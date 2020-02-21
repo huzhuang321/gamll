@@ -71,7 +71,6 @@ public class SkuController {
 
     /**
      * 获取商品的详情
-     *
      * @param skuId
      * @return
      */

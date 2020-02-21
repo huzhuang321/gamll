@@ -15,13 +15,22 @@ public class ItemController {
     @Autowired
     private ItemClient itemClient;
 
+    /**
+     * 根据skuid查询商品详情信息
+     * @param skuId
+     * @return
+     */
     @RequestMapping("/serchItemMsg")
     public ResponseMessage serchItemMsg(String skuId) {
         ResponseMessage responseMessage = itemClient.searchPmsSkuInfo(skuId);
         return responseMessage;
     }
 
-
+    /**
+     * 根据一级分类商品catalog1Id查询二级分类
+     * @param catalog1Id
+     * @return
+     */
     @RequestMapping("/getCatalog2")
     public ResponseMessage getCatalog2(@RequestParam String catalog1Id) {
         ResponseMessage responseMessage = itemClient.getCatalog2(catalog1Id);
