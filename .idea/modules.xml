@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/gmall.iml" filepath="$PROJECT_DIR$/gmall.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gmall-common/gmall-common.iml" filepath="$PROJECT_DIR$/gmall-common/gmall-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gmall-gateway/gmall-gateway.iml" filepath="$PROJECT_DIR$/gmall-gateway/gmall-gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gmall-item/gmall-item.iml" filepath="$PROJECT_DIR$/gmall-item/gmall-item.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gmall-item/gmall-item-interface/gmall-item-interface.iml" filepath="$PROJECT_DIR$/gmall-item/gmall-item-interface/gmall-item-interface.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gmall-manage/gmall-manage.iml" filepath="$PROJECT_DIR$/gmall-manage/gmall-manage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gmall-manage/gmall-manage-interface/gmall-manage-interface.iml" filepath="$PROJECT_DIR$/gmall-manage/gmall-manage-interface/gmall-manage-interface.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gmall-manage/gmall-manage-service/gmall-manage-service.iml" filepath="$PROJECT_DIR$/gmall-manage/gmall-manage-service/gmall-manage-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gmall-registry/gmall-registry.iml" filepath="$PROJECT_DIR$/gmall-registry/gmall-registry.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gmall-item/leyou-item-service/leyou-item-service.iml" filepath="$PROJECT_DIR$/gmall-item/leyou-item-service/leyou-item-service.iml" />
+    </modules>
+  </component>
+</project>
